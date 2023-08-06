@@ -1,0 +1,95 @@
+{{ define "main" }}
+    <div class="max-w-md mx-auto bg-white shadow-md rounded p-4">
+        {{ $user := .user }}
+        {{ $chat := .chatID}}
+        <h1 class="text-xl font-semibold mb-4"> {{ $user.Name}}</h1>
+        <div class="border rounded-lg">
+            <div class="bg-gray-100 p-4 h-72 overflow-y-scroll space-y-2" id="messages-container">
+                {{ $currentUser := .currentUser.String}}
+                {{ $len := len .messages}}
+                {{ if eq $len 0}}
+                    <div class="flex w-full justify-center items-center" id="empty-state">
+                        <span class="text-sm">No messages yet</span>
+                    </div>
+                {{else}}
+                    {{ range .messages}}
+                        <div class="bg-white rounded p-4 shadow">
+                            <div class="font-semibold  mb-1 flex gap-2 items-center justify-between" style="color: {{.SenderColor.String}};">
+                                <div class="text-gray-500 text-xs mt-1 dateMessage">{{ .Date}}</div>
+                                <div class="inline-flex gap-2 items-center">
+                                    <p>{{ .SenderName}}</p>
+                                    <div class="h-8 w-8 rounded-full flex items-center justify-center" style="background-color: {{.SenderColor.String}};">
+                                        <span class="text-white text-sm font-semibold">{{.SenderInitial}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-gray-800 break-words text-sm">
+                                <span>{{ .Content }}</span>
+                            </span>
+                        </div>
+                    {{ end }}  
+                {{ end }}
+            </div>
+            {{ $userLogged := .userLogged}}
+            <div class="bg-gray-200 p-4 flex items-center">
+                <input type="text" class="flex-grow border rounded p-2" id="message"  placeholder="Type a message...">
+                <button class="ml-2 bg-blue-500 text-white rounded px-4 py-2" data-receiver="{{ $user.ID }}" data-initial="{{$userLogged.NameInitial}}" data-sender="{{ $currentUser}}" data-chat="{{ $chat }}" onclick="sendMessage(event)">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allDates = document.querySelectorAll(".dateMessage");
+        for (const date of allDates) {
+            date.innerHTML = moment(date.innerHTML).local().format("DD/MM/YYYY HH:mm");
+        }
+
+        const socket = io();
+        const s2 = io("/chat");
+
+        s2.on("reply", (data) => {
+            const messagesContainer = document.getElementById("messages-container");
+            const emptyState = document.getElementById("empty-state");
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const date = moment(data.date).local().format("DD/MM/YYYY HH:mm");
+            let html = `
+            <div class="bg-white rounded p-4 shadow">
+                <div class="font-semibold  mb-1 flex gap-2 items-center justify-between" style="color: ${data.sender_color};">
+                    <div class="text-gray-500 text-xs mt-1 dateMessage">${date}</div>
+                    <div class="inline-flex gap-2 items-center">
+                        <p>${data.name}</p>
+                        <div class="h-8 w-8 rounded-full flex items-center justify-center" style="background-color: ${data.sender_color};">
+                            <span class="text-white text-sm font-semibold">${data.sender_initial}</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="text-gray-800 break-words text-sm">
+                    <span>${data.content}</span>
+                </span>
+            </div>`;
+            messagesContainer.innerHTML += html;
+        })
+
+
+        function sendMessage(event) {
+            const target = event.target
+            const sender = target.dataset.sender
+            const chat = target.dataset.chat
+            const receiver = target.dataset.receiver
+            event.preventDefault();
+            const message = document.getElementById("message").value;
+            s2.emit("msg", {
+                message: message,
+                senderID: sender,
+                chatID: chat,
+                receiverID: receiver,
+                initial: target.dataset.initial
+            });
+            document.getElementById("message").value = "";
+        }
+
+    </script>
+{{ end }}

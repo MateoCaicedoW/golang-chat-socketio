@@ -1,0 +1,47 @@
+{{ define "main" }}
+    <div class="max-w-md mx-auto bg-white shadow-md rounded p-4 w-72">
+        <div class="flex w-full justify-between items-center pb-5">
+            <h1 class="text-xl font-semibold">Chats</h1>
+            <a href="/chats/new" class="flex flex-column">
+                <span class="text-sm">New Chat</span>
+            </a>
+        </div>
+        {{ $currentUser := .currentUser}}
+
+        {{ $len := len .chats}}
+        {{ if eq $len 0}}
+            <div class="flex w-full justify-center items-center">
+                <span class="text-sm">No chats yet</span>
+            </div>
+        {{else}}
+            <ul class="divide-y divide-gray-300">
+                {{ range .chats}}
+                    <li class="py-2">
+                        {{ if ne $currentUser .FirstUserID.String}}
+                            <a   onclick="joinRoon()" class="flex items-center space-x-2">
+                                <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: {{ .FirstUserColor.String }};">
+                                    <span class="text-white text-lg font-semibold">{{ .FirstUserInitial }}</span>
+                                </div>
+                                <span class="font-semibold">{{ .FirstUserName}}</span>
+                            </a>
+                        {{ else }}
+                            <a href="/chats/{{ .SecondUserID.String }}/show" onclick="joinRoon()"  class="flex items-center space-x-2">
+                                <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: {{ .SecondUserColor.String }};">
+                                    <span class="text-white text-lg font-semibold"> {{ .SecondUserInitial }}</span>
+                                </div>
+                                <span class="font-semibold">{{ .SecondUserName}}</span>
+                            </a>
+                        {{ end }}
+                    </li>
+                {{ end }}
+            </ul>
+        {{ end }}
+    </div>
+    
+    <script>
+        const socket = io();
+        function joinRoon(){
+            socket.emit('join', 'room1');
+        }
+    </script>
+{{ end }}

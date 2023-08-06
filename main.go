@@ -1,34 +1,40 @@
 package main
 
 import (
-  "log"
-  "net/http"
-  
-  "github.com/googollee/go-socket.io"
+	"log"
+	"main/actions/chats"
+	"main/actions/login"
+	"main/chat"
+	"main/middleware"
+	"net/http"
+	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-  server, err := socketio.NewServer(nil)
+	router := mux.NewRouter()
 
-  if err!= nil {
-    log.Fatal(err)
-  }
-  
-  // sockets 
-  server.On("connection", func(so socketio.Socket) {
-    log.Println("A new user connected")
+	server := chat.NewChatServer()
+	go server.Serve()
+	router.HandleFunc("/", login.New).Methods("GET")
+	router.HandleFunc("/login/create", login.Create).Methods("POST")
+	router.Handle("/socket.io/", server)
 
-    so.Join("chat_room")
-    so.On("chat message", func (msg string) {
-      log.Println("emit: ", so.Emit("chat message", msg))
-      so.BroadcastTo("chat_room", "chat message", msg)
-    })
-  })
+	routeProtected := router.PathPrefix("/").Subrouter()
+	routeProtected.Use(middleware.IsLogged)
+	routeProtected.HandleFunc("/chats", chats.List).Methods("GET")
+	routeProtected.HandleFunc("/chats/new", chats.New).Methods("GET")
+	routeProtected.HandleFunc("/chats/{user_id}/show", chats.Show).Methods("GET")
 
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         "localhost:3000",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 
-  http.Handle("/socket.io/", server)
-  http.Handle("/", http.FileServer(http.Dir("./public")))
-  log.Println("Server on port 3000")
-  log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Println("Serving at localhost:3000...")
+	log.Fatal(srv.ListenAndServe())
+
 }
-

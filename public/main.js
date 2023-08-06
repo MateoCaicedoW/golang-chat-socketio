@@ -1,12 +1,11 @@
 const socket = io();
-
+const s2 = io("/chat");
 new Vue({
   el: '#chat-app',
   created() {
-    socket.on("chat message", (message) => {
-      console.log(message)
+    s2.on("reply", (data) => {
       this.messages.push({
-        text: message,
+        text: data,
         date: new Date().toLocaleString()
       })
     })
@@ -17,7 +16,8 @@ new Vue({
   },
   methods: {
     sendMessage() {
-      socket.emit("chat message", this.message)
+      s2.emit("msg", this.message)
+      console.log(this.message);
       this.message = "";
     }
   }
