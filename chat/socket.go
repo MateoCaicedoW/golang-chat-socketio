@@ -10,28 +10,33 @@ var server = socketio.NewServer(nil)
 
 // implement the chat server which will be used in main.go only to start the server
 func NewChatServer() *socketio.Server {
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		return nil
-	})
 
-	// write a function to hanlde the join room event
-	server.OnEvent("/", "join", func(s socketio.Conn, room string) {
-		fmt.Println("join")
-		fmt.Println("room: ", room)
-		s.Join(room)
-		s.Emit("join", room)
-
-	})
-
-	setMethods()
+	server.OnEvent("/", "msg", SendMessage)
+	server.OnEvent("/", "join", JoinRoom)
+	server.OnEvent("/", "leave", LeaveRoom)
+	server.OnEvent("/", "chat", SendMessage)
+	server.OnEvent("/", "typing", Typing)
+	server.OnEvent("/", "stop typing", StopTyping)
+	server.OnEvent("/", "disconnect", Disconnect)
 	return server
 }
 
-func setMethods() *socketio.Server {
-	// server.JoinRoom("/", "chat")
+func LeaveRoom(s socketio.Conn, room string) {
+	s.Leave(room)
+	fmt.Println("leave", room)
+}
 
-	server.OnEvent("/chat", "msg", SendMessage)
+func Typing(s socketio.Conn, room string) {
+	fmt.Println("typing", room)
+	server.BroadcastToRoom("/", room, "typing", "")
+}
 
-	return server
+func StopTyping(s socketio.Conn, room string) {
+	fmt.Println("stop typing", room)
+	server.BroadcastToRoom("/", room, "stop typing", "")
+}
+
+func Disconnect(s socketio.Conn, room string) {
+	fmt.Println("disconnect", room)
+	server.BroadcastToRoom("/", room, "disconnect", "")
 }

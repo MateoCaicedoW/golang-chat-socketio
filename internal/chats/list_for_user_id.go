@@ -31,7 +31,9 @@ func ListForUserID(tx *sql.DB, userID uuid.UUID) ([]Chat, error) {
 	FROM chats
 	JOIN users ON chats.first_user = users.id
 	JOIN users users2 ON chats.second_user = users2.id
-	WHERE chats.first_user = $1 OR chats.second_user = $1;
+	JOIN messages on messages.chat_id = chats.id
+	WHERE chats.first_user = $1 OR chats.second_user = $1
+	GROUP BY chats.id, users.id, users.name, users.color, users2.id, users2.name, users2.name;
 
 	`, userID)
 	if err != nil {

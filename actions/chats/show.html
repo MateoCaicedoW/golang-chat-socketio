@@ -44,10 +44,19 @@
             date.innerHTML = moment(date.innerHTML).local().format("DD/MM/YYYY HH:mm");
         }
 
-        const socket = io();
-        const s2 = io("/chat");
+        const usr = "{{ .user.ID.String}}"
+        const currentUser = "{{ .currentUser }}"
 
-        s2.on("reply", (data) => {
+        const socket = io();
+        socket.on("connect", () => {
+            console.log("connected");
+            socket.emit("join", {
+                firstUserID: usr,
+                secondUserID: currentUser
+            });
+        });
+
+        socket.on("reply", (data) => {
             const messagesContainer = document.getElementById("messages-container");
             const emptyState = document.getElementById("empty-state");
             if (emptyState) {
@@ -73,7 +82,6 @@
             messagesContainer.innerHTML += html;
         })
 
-
         function sendMessage(event) {
             const target = event.target
             const sender = target.dataset.sender
@@ -81,7 +89,8 @@
             const receiver = target.dataset.receiver
             event.preventDefault();
             const message = document.getElementById("message").value;
-            s2.emit("msg", {
+            
+            socket.emit("msg", {
                 message: message,
                 senderID: sender,
                 chatID: chat,
@@ -90,6 +99,5 @@
             });
             document.getElementById("message").value = "";
         }
-
     </script>
 {{ end }}

@@ -18,6 +18,7 @@ func New(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	render.SetData("currentUser", currentUser)
 	render.SetData("users", userList)
 	render.RenderWithLayout(w, "/chats/new.html", "application.html")
 }

@@ -1,15 +1,30 @@
 {{ define "main"}}
-<div class="max-w-md mx-auto bg-white shadow-md rounded p-4">
-    <h1 class="text-xl font-semibold mb-4">All Users</h1>
-    <div class="grid grid-cols-2 gap-4">
-        {{ range .users}}
-            <a href="/chats/{{ .ID.String }}/show" class="p-4 bg-gray-200 rounded-lg flex items-center space-x-4">
-                <div class="h-12 w-12 rounded-full flex items-center justify-center" style="background-color: {{ .Color.String}};">
-                    <span class="text-white text-lg font-semibold">{{ .Initial }}</span>
-                </div>
-                <span class="font-semibold">{{ .Name}}</span>
-            </a>
-        {{ end }}
+
+    {{ $currentUser := .currentUser}}
+    <div class="max-w-md mx-auto bg-white shadow-md rounded p-4">
+        <h1 class="text-xl font-semibold mb-4">All Users</h1>
+        <div class="grid grid-cols-2 gap-4">
+            {{ range .users}}
+                <a href="/chats/{{ .ID.String }}/show"  data-id="{{ .ID.String }}" onclick="joinRoon(event)" class="p-4 bg-gray-200 rounded-lg flex items-center space-x-4">
+                    <div class="h-12 w-12 rounded-full flex items-center justify-center" style="background-color: {{ .Color.String}};">
+                        <span class="text-white text-lg font-semibold">{{ .Initial }}</span>
+                    </div>
+                    <span class="font-semibold">{{ .Name}}</span>
+                </a>
+            {{ end }}
+        </div>
     </div>
-</div>
+
+    <!-- <script>
+        const socket = io();
+        function joinRoon(event){
+            event.preventDefault();
+            const target = event.currentTarget
+            const id = target.dataset.id
+            const currentUser = "{{ .currentUser }}"
+            socket.emit('join', `${id + currentUser}`);
+
+            window.location.href = `/chats/${id}/show`
+        }
+    </script> -->
 {{ end }}

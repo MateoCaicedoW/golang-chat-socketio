@@ -18,14 +18,14 @@
                 {{ range .chats}}
                     <li class="py-2">
                         {{ if ne $currentUser .FirstUserID.String}}
-                            <a   onclick="joinRoon()" class="flex items-center space-x-2">
+                            <a href="/chats/{{ .FirstUserID.String }}/show" class="flex items-center space-x-2">
                                 <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: {{ .FirstUserColor.String }};">
                                     <span class="text-white text-lg font-semibold">{{ .FirstUserInitial }}</span>
                                 </div>
                                 <span class="font-semibold">{{ .FirstUserName}}</span>
                             </a>
                         {{ else }}
-                            <a href="/chats/{{ .SecondUserID.String }}/show" onclick="joinRoon()"  class="flex items-center space-x-2">
+                            <a href="/chats/{{ .SecondUserID.String }}/show" class="flex items-center space-x-2">
                                 <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: {{ .SecondUserColor.String }};">
                                     <span class="text-white text-lg font-semibold"> {{ .SecondUserInitial }}</span>
                                 </div>
@@ -37,11 +37,5 @@
             </ul>
         {{ end }}
     </div>
-    
-    <script>
-        const socket = io();
-        function joinRoon(){
-            socket.emit('join', 'room1');
-        }
-    </script>
+
 {{ end }}

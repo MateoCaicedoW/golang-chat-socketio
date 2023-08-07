@@ -11,18 +11,13 @@ import (
 )
 
 func SendMessage(s socketio.Conn, message map[string]string) string {
-	var chatID uuid.UUID
+	firstUserID := uuid.FromStringOrNil(message["receiverID"])
+	secondUserID := uuid.FromStringOrNil(message["senderID"])
 
-	chatID = uuid.FromStringOrNil(message["chatID"])
-	if chatID.IsNil() {
-
-		chat, err := chats.Create(db.Tx, uuid.FromStringOrNil(message["senderID"]), uuid.FromStringOrNil(message["receiverID"]))
-		if err != nil {
-			fmt.Println(err)
-			return ""
-		}
-
-		chatID = chat.ID
+	chatID, err := chats.Exists(db.Tx, firstUserID, secondUserID)
+	if err != nil {
+		fmt.Println(err)
+		return ""
 	}
 
 	msg, err := messages.Create(db.Tx, uuid.FromStringOrNil(message["senderID"]), chatID, message["message"])
@@ -43,10 +38,6 @@ func SendMessage(s socketio.Conn, message map[string]string) string {
 		"receiver_id":    message["receiverID"],
 	}
 
-	s.SetContext(msg)
-	fmt.Println("s", s.Rooms())
-	// s.Emit("reply", message)
-
-	server.BroadcastToRoom("/", s.Rooms()[0], "reply", message)
+	server.BroadcastToRoom("/", chatID.String(), "reply", message)
 	return "recv " + message["msg"]
 }
