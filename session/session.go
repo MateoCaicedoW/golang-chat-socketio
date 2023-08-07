@@ -29,3 +29,9 @@ func IsLoggedIn(r *http.Request) bool {
 	session, _ := Store.Get(r, "session")
 	return session.Values["user_id"] != nil
 }
+
+func Destroy(w http.ResponseWriter, r *http.Request) {
+	session, _ := Store.Get(r, "session")
+	session.Options.MaxAge = -1
+	session.Save(r, w)
+}

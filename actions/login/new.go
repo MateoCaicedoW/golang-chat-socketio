@@ -13,5 +13,5 @@ func New(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.RenderWithLayout(w, "/login/login.html", "application.html")
+	render.RenderWithLayout(w, "/login/login.html", "auth.html")
 }

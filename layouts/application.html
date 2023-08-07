@@ -7,9 +7,31 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.socket.io/socket.io-1.7.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+
     <title>Messages App</title>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen">
-    {{block "main" .}} {{end}}
+<body class="bg-gray-100" id="body">
+    <header class="flex justify-between items-center px-4 pt-2 bg-gray-100">
+        <div class="flex items-center gap-2">
+            <div class="h-12 w-12 rounded-full flex items-center justify-center" style="background-color: {{ .currentUser.Color.String }};">
+                <span class="text-white text-lg font-semibold"> {{ .currentUser.Initial }}</span>
+            </div>
+            <h1 class="text-gray-600 text-lg font-semibold">{{.currentUser.Name}}</h1>
+        </div>
+
+        <nav>
+            <a href="/chats">Chats</a>
+        </nav>
+        <button hx-post="/logout" hx-target="#body" hx-swap="innerHTML" class="text-gray-700 hover:text-gray-800">
+            Log out
+        </button>
+    </header>
+    
+    <section class=" flex justify-center items-center h-minus" style="height: calc(100vh - 68px);">
+        {{block "main" .}} 
+    
+        {{end}}
+    </section>
 </body>
 </html>

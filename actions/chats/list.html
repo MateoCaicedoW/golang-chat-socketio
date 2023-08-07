@@ -17,7 +17,7 @@
             <ul class="divide-y divide-gray-300">
                 {{ range .chats}}
                     <li class="py-2">
-                        {{ if ne $currentUser .FirstUserID.String}}
+                        {{ if ne $currentUser.ID.String .FirstUserID.String}}
                             <a href="/chats/{{ .FirstUserID.String }}/show" class="flex items-center space-x-2">
                                 <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: {{ .FirstUserColor.String }};">
                                     <span class="text-white text-lg font-semibold">{{ .FirstUserInitial }}</span>

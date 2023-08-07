@@ -23,9 +23,11 @@ func main() {
 
 	routeProtected := router.PathPrefix("/").Subrouter()
 	routeProtected.Use(middleware.IsLogged)
+	routeProtected.Use(middleware.SetCurrentUser)
 	routeProtected.HandleFunc("/chats", chats.List).Methods("GET")
 	routeProtected.HandleFunc("/chats/new", chats.New).Methods("GET")
 	routeProtected.HandleFunc("/chats/{user_id}/show", chats.Show).Methods("GET")
+	routeProtected.HandleFunc("/logout", login.Destroy).Methods("POST")
 
 	srv := &http.Server{
 		Handler:      router,
@@ -35,6 +37,8 @@ func main() {
 	}
 
 	log.Println("Serving at localhost:3000...")
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
 	log.Fatal(srv.ListenAndServe())
 
 }

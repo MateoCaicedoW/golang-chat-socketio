@@ -5,7 +5,7 @@
         <h1 class="text-xl font-semibold mb-4"> {{ $user.Name}}</h1>
         <div class="border rounded-lg">
             <div class="bg-gray-100 p-4 h-72 overflow-y-scroll space-y-2" id="messages-container">
-                {{ $currentUser := .currentUser.String}}
+                {{ $currentUser := .currentUser}}
                 {{ $len := len .messages}}
                 {{ if eq $len 0}}
                     <div class="flex w-full justify-center items-center" id="empty-state">
@@ -33,7 +33,7 @@
             {{ $userLogged := .userLogged}}
             <div class="bg-gray-200 p-4 flex items-center">
                 <input type="text" class="flex-grow border rounded p-2" id="message"  placeholder="Type a message...">
-                <button class="ml-2 bg-blue-500 text-white rounded px-4 py-2" data-receiver="{{ $user.ID }}" data-initial="{{$userLogged.NameInitial}}" data-sender="{{ $currentUser}}" data-chat="{{ $chat }}" onclick="sendMessage(event)">Send</button>
+                <button class="ml-2 bg-blue-500 text-white rounded px-4 py-2" data-receiver="{{ $user.ID.String }}" data-initial="{{$userLogged.NameInitial}}" data-sender="{{ $currentUser.ID.String}}" data-chat="{{ $chat }}" onclick="sendMessage(event)">Send</button>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
         }
 
         const usr = "{{ .user.ID.String}}"
-        const currentUser = "{{ .currentUser }}"
+        const currentUser = "{{ $currentUser.ID.String }}"
 
         const socket = io();
         socket.on("connect", () => {
