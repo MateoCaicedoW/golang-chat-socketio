@@ -18,7 +18,7 @@ func init() {
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		fmt.Println("running without database connection")
 	}
 
 	Tx = db

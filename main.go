@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"main/actions/chats"
+	"main/actions/csv"
 	"main/actions/login"
 	"main/chat"
 	"main/middleware"
@@ -17,6 +18,8 @@ func main() {
 
 	server := chat.NewChatServer()
 	go server.Serve()
+	router.HandleFunc("/csv", csv.Show).Methods("GET")
+	router.HandleFunc("/csv/process", csv.Process).Methods("POST")
 	router.HandleFunc("/", login.New).Methods("GET")
 	router.HandleFunc("/login/create", login.Create).Methods("POST")
 	router.Handle("/socket.io/", server)
