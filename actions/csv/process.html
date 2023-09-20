@@ -6,27 +6,35 @@
                 <div class="bg-white shadow-md rounded my-6">
                     <table class="min-w-max w-full table-auto">
                         <thead>
-                            {{ range $i, $a :=.matrix}}
+                            {{ range $i, $a := .matrix}}
                                 {{if eq $i 0}}
                                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                     {{ range $j, $b := $a }}
                                     <th class="py-3 px-6 text-left">{{ $b  }}</th>
                                     {{ end }}
                                 </tr>
-                                {{ end }}
-                            {{ end }}
+                                {{end}}
+                            {{end}}
                         </thead>
                         <tbody class="text-gray-600 text-sm font-light">
-                            {{ range $i, $a :=.matrix}}
-                                <tr class="border-b border-gray-200 hover:bg-gray-100 ">
-                                    {{if ne $i 0}}
+                            {{ range $i, $a := .matrix}}
+                                {{if ne $i 0}}
+                                    <tr class="border-b border-gray-200 hover:bg-gray-100 ">
                                         {{ range $j, $b := $a }}
-                                            <td class="py-3 px-6 text-left {{ if eq $b "empty"}} bg-red-200 text-white {{end}}">
-                                                {{ if ne $b "empty"}} {{ $b }}{{end}}
-                                                </td>
+                                            {{ $v :=(printf "%d%d" $i $j) }}
+                                            {{ $d := index $.errors $v }}
+                                            <td class="py-3 px-6 text-left   {{ if $d }} bg-red-200 text-red-500 {{end}}">
+                                                {{ if $d}} 
+                                                    {{ range $d}}
+                                                        {{ . }}
+                                                    {{end}}
+                                                {{ else }} 
+                                                    {{ $b }}
+                                                {{ end }}
+                                            </td>
                                         {{ end }}
-                                    {{end}}
-                                </tr>
+                                    </tr>
+                                {{end}}
                             {{end}}
                         </tbody>
                     </table>
