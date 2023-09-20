@@ -23,7 +23,7 @@
                                         {{ range $j, $b := $a }}
                                             {{ $v :=(printf "%d%d" $i $j) }}
                                             {{ $d := index $.errors $v }}
-                                            <td class="py-3 px-6 text-left   {{ if $d }} bg-red-200 text-red-500 {{end}}">
+                                            <td contenteditable="true" class="py-3 px-6 text-left   {{ if $d }} bg-red-200 text-red-500 {{end}}">
                                                 {{ if $d}} 
                                                     {{ range $d}}
                                                         {{ . }}

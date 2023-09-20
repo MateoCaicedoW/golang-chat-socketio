@@ -10,7 +10,7 @@ import (
 func Process(file io.Reader, headers map[string]string) ([][]string, map[string][]string, error) {
 	valuesFound := map[string]bool{}
 	errors := map[string][]string{}
-	excelizeFile, err := excelize.OpenReader(file, excelize.Options{})
+	excelizeFile, err := excelize.OpenReader(file)
 	if err != nil {
 		return [][]string{}, errors, err
 	}
@@ -27,6 +27,7 @@ func Process(file io.Reader, headers map[string]string) ([][]string, map[string]
 				analysis.CheckError(cell, i, j, headers, rows, errors, valuesFound)
 				rowSlice = append(rowSlice, cell)
 			}
+
 			matrix = append(matrix, rowSlice)
 		}
 	}
